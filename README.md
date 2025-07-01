@@ -1,6 +1,4 @@
 # dbgui
-
-<<<<<<< HEAD
 [![npm](https://img.shields.io/npm/v/dbgui)](https://www.npmjs.com/package/dbgui)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fhydrogenmacro.github.io%2Fdbgui)](https://hydrogenmacro.github.io/dbgui)
 
