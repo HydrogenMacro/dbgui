@@ -1,31 +1,36 @@
 {
-  "name": "dbgui",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@react-three/fiber": "^9.1.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "three": "^0.177.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.29.0",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.5.2",
-    "eslint": "^9.29.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.2.0",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.34.1",
-    "vite": "^7.0.0"
-  }
+    "name": "dbgui",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "lint": "eslint .",
+        "preview": "vite preview",
+        "fmt": "npx prettier --write ."
+    },
+    "dependencies": {
+        "@react-three/drei": "^10.4.2",
+        "@react-three/fiber": "^9.1.4",
+        "@types/three": "^0.178.0",
+        "dbgui": "^1.0.0",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "three": "^0.177.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.29.0",
+        "@types/react": "^19.1.8",
+        "@types/react-dom": "^19.1.6",
+        "@vitejs/plugin-react": "^4.5.2",
+        "eslint": "^9.29.0",
+        "eslint-plugin-react-hooks": "^5.2.0",
+        "eslint-plugin-react-refresh": "^0.4.20",
+        "globals": "^16.2.0",
+        "prettier": "^3.6.2",
+        "typescript": "~5.8.3",
+        "typescript-eslint": "^8.34.1",
+        "vite": "^7.0.0"
+    }
 }
