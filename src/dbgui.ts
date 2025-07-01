@@ -724,6 +724,7 @@ function sanitizeQuotedString(str: string): string {
     return str.replaceAll("\\", "\\\\").replaceAll(`"`, `\\"`);
 }
 declare global {
+    const dbgui: () => DbgUI;
     interface Window {
         dbgui: () => DbgUI;
     }

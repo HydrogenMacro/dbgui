@@ -24,6 +24,7 @@ declare class DbgUI {
     addIn(categoryName: string, key: string, widget: Widget | null): this;
 }
 declare global {
+    const dbgui: () => DbgUI;
     interface Window {
         dbgui: () => DbgUI;
     }
