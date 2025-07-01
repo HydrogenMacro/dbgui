@@ -5,7 +5,7 @@ declare class DbgUICategory {
     widgetsContainerEl: HTMLElement;
     constructor(key: string);
     static of(key: string, dbgui: DbgUI): DbgUICategory;
-    add(key: string, widget: Widget): this;
+    add(key: string, widget: Widget | null): this;
 }
 declare class DbgUI {
     /**
@@ -19,8 +19,9 @@ declare class DbgUI {
     categoriesContainerEl: HTMLElement;
     constructor();
     _addToDocument(): void;
-    add(key: string, widget: Widget): this;
+    add(key: string, widget: Widget | null): this;
     in(categoryName: string): DbgUICategory;
+    addIn(categoryName: string, key: string, widget: Widget | null): this;
 }
 declare global {
     interface Window {

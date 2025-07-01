@@ -14,7 +14,7 @@ export declare class Widget {
 declare class Button extends Widget {
     text: string;
     clickCb: () => void;
-    constructor(text: string);
+    constructor(text?: string);
     ["onClick"](clickCb: () => void): this;
     create(): HTMLElement;
 }
@@ -46,6 +46,7 @@ declare class ValueDisplay<T> extends Widget {
  */
 declare class TextInput extends Widget {
     pollIntervalMs: number;
+    textInputEl: HTMLInputElement | undefined;
     getText: () => string;
     constructor(getText?: () => string);
     onInputCb: (_: string) => void;
@@ -59,6 +60,7 @@ declare class TextInput extends Widget {
  */
 declare class NumberInput extends Widget {
     pollIntervalMs: number;
+    numberInputEl: HTMLInputElement | undefined;
     getNumber: () => number;
     constructor(getNumber?: () => number);
     onInputCb: (val: number) => void;
@@ -83,6 +85,16 @@ declare class RangeInput extends Widget {
     ["onInput"](cb: (val: number) => void): this;
     create(): HTMLElement;
 }
+/**
+ * @unrestriced
+ */
+declare class Group extends Widget {
+    children: Array<Widget>;
+    constructor(...children: Array<Widget>);
+    direction: "row" | "column";
+    ["withDir"](direction: "row" | "column"): this;
+    create(): HTMLElement;
+}
 declare let widgets: {
     $button: (text: string) => Button;
     $valueDisplay: <T>(valueGetter: () => T) => ValueDisplay<T>;
@@ -91,6 +103,7 @@ declare let widgets: {
     $number: (getNumber?: () => number) => NumberInput;
     $range: (min?: number, max?: number, step?: number, getNumber?: () => number) => RangeInput;
     $slider: (min?: number, max?: number, step?: number, getNumber?: () => number) => RangeInput;
+    $group: (...children: Array<Widget>) => Group;
 };
 type Widgets = {
     [K in keyof typeof widgets]: (typeof widgets)[K];

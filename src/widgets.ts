@@ -19,7 +19,7 @@ export class Widget {
 class Button extends Widget {
     text: string;
     clickCb: () => void = () => {};
-    constructor(text: string) {
+    constructor(text: string = "Click") {
         super();
         this.text = text;
     }
@@ -77,6 +77,8 @@ class ValueDisplay<T> extends Widget {
         let valueDisplayContainerEl = elWithStyle({
             "display": "flex",
             "flex-direction": "row",
+            "align-items": "center",
+            "gap": "3px",
         });
         if (this.pollInterval === "manual") {
             let valueDisplayEl = elWithStyle({});
@@ -136,10 +138,15 @@ class ValueDisplay<T> extends Widget {
  */
 class TextInput extends Widget {
     pollIntervalMs = 100;
+    textInputEl: HTMLInputElement | undefined = undefined;
     getText = () => "";
     constructor(getText?: () => string) {
         super();
-        if (getText) this.getText = getText;
+        if (getText) {
+            this.getText = getText;
+        } else {
+            this.getText = () => this.textInputEl?.value ?? "";
+        }
     }
     onInputCb = (_: string) => {};
     ["onInput"](cb: (val: string) => void): this {
@@ -152,15 +159,23 @@ class TextInput extends Widget {
         return this;
     }
     create(): HTMLElement {
-        let textInputEl = elWithStyle({
-             
-        }, "input");
+        let textInputEl = (this.textInputEl = elWithStyle(
+            {
+                "min-width": "0",
+                "max-width": "80px",
+            },
+            "input"
+        ));
         textInputEl.value = this.getText();
         let isFocused = false;
-        textInputEl.addEventListener("focus", () => isFocused = true);
-        textInputEl.addEventListener("blur", () => isFocused = true);
-        textInputEl.addEventListener("input", () => this.onInputCb(textInputEl.value));
-        textInputEl.addEventListener("change", () => this.onChangeCb(textInputEl.value));
+        textInputEl.addEventListener("focus", () => (isFocused = true));
+        textInputEl.addEventListener("blur", () => (isFocused = true));
+        textInputEl.addEventListener("input", () =>
+            this.onInputCb(textInputEl.value)
+        );
+        textInputEl.addEventListener("change", () =>
+            this.onChangeCb(textInputEl.value)
+        );
         setTimeout(() => {
             if (isFocused) return;
             textInputEl.value = this.getText();
@@ -173,10 +188,16 @@ class TextInput extends Widget {
  */
 class NumberInput extends Widget {
     pollIntervalMs = 100;
+    numberInputEl: HTMLInputElement | undefined = undefined;
     getNumber = () => 0;
+
     constructor(getNumber?: () => number) {
         super();
-        if (getNumber) this.getNumber = getNumber;
+        if (getNumber) {
+            this.getNumber = getNumber;
+        } else {
+            this.getNumber = () => +(this.numberInputEl?.value ?? 0);
+        }
     }
     onInputCb = (val: number) => {};
     ["onInput"](cb: (val: number) => void): this {
@@ -189,16 +210,24 @@ class NumberInput extends Widget {
         return this;
     }
     create(): HTMLElement {
-        let numberInputEl = elWithStyle({
-             
-        }, "input");
-        numberInputEl.type = "number"
+        let numberInputEl = (this.numberInputEl = elWithStyle(
+            {
+                "min-width": "0",
+                "max-width": "80px",
+            },
+            "input"
+        ));
+        numberInputEl.type = "number";
         numberInputEl.value = this.getNumber() + "";
         let isFocused = false;
-        numberInputEl.addEventListener("focus", () => isFocused = true);
-        numberInputEl.addEventListener("blur", () => isFocused = true);
-        numberInputEl.addEventListener("input", () => this.onInputCb(numberInputEl.value as any as number));
-        numberInputEl.addEventListener("change", () => this.onChangeCb(numberInputEl.value as any as number));
+        numberInputEl.addEventListener("focus", () => (isFocused = true));
+        numberInputEl.addEventListener("blur", () => (isFocused = true));
+        numberInputEl.addEventListener("input", () =>
+            this.onInputCb(numberInputEl.value as any as number)
+        );
+        numberInputEl.addEventListener("change", () =>
+            this.onChangeCb(numberInputEl.value as any as number)
+        );
         setTimeout(() => {
             if (isFocused) return;
             numberInputEl.value = this.getNumber() + "";
@@ -216,11 +245,16 @@ class RangeInput extends Widget {
     max: number;
     step: number;
     getNumber = () => 0;
-    constructor(min: number = 0, max: number = 100, step: number = 1, getNumber?: () => number) {
+    constructor(
+        min: number = 0,
+        max: number = 100,
+        step: number = 1,
+        getNumber?: () => number
+    ) {
         super();
-        this.min = min; 
-        this.max = max; 
-        this.step = step; 
+        this.min = min;
+        this.max = max;
+        this.step = step;
         if (getNumber) this.getNumber = getNumber;
     }
     onChangeCb = (_: number) => {};
@@ -234,24 +268,47 @@ class RangeInput extends Widget {
         return this;
     }
     create(): HTMLElement {
-        let rangeEl = elWithStyle({
-             
-        }, "input");
-        rangeEl.type = "range"
+        let minDisplayEl = elWithStyle({});
+        minDisplayEl.textContent = this.min + "";
+
+        let maxDisplayEl = elWithStyle({});
+        maxDisplayEl.textContent = this.max + "";
+
+        let rangeEl = elWithStyle(
+            {
+                "max-width": "80px",
+                "min-width": "0",
+                "width": "80px",
+                "flex": "1",
+            },
+            "input"
+        );
+        rangeEl.type = "range";
         rangeEl.value = this.getNumber() + "";
         rangeEl.min = this.min + "";
         rangeEl.max = this.max + "";
         rangeEl.step = this.step + "";
         let isFocused = false;
-        rangeEl.addEventListener("focus", () => isFocused = true);
-        rangeEl.addEventListener("blur", () => isFocused = true);
-        rangeEl.addEventListener("input", () => this.onInputCb(rangeEl.value as any as number));
-        rangeEl.addEventListener("change", () => this.onChangeCb(rangeEl.value as any as number));
+        rangeEl.addEventListener("focus", () => (isFocused = true));
+        rangeEl.addEventListener("blur", () => (isFocused = true));
+        rangeEl.addEventListener("input", () =>
+            this.onInputCb(rangeEl.value as any as number)
+        );
+        rangeEl.addEventListener("change", () =>
+            this.onChangeCb(rangeEl.value as any as number)
+        );
         setTimeout(() => {
             if (isFocused) return;
             rangeEl.value = this.getNumber() + "";
         }, this.pollIntervalMs);
-        return rangeEl;
+
+        let containerEl = elWithStyle({
+            "display": "flex",
+            "min-width": "0",
+            "align-items": "center",
+        });
+        containerEl.append(minDisplayEl, rangeEl, maxDisplayEl);
+        return containerEl;
     }
 }
 
@@ -259,24 +316,29 @@ class RangeInput extends Widget {
  * @unrestriced
  */
 class Group extends Widget {
-		children: Array<Widget>;
-		constructor(...children: Array<Widget>) {
-				this.children = children;
-		}
-		direction: "row" | "column" = "row";
-		["withDir"](direction: "row" | "column"): this {
-				this.direction = direction;
-				return this;
-		}
-		create(): HTMLElement {
-				let groupEl = elWithStyle({
-						"display": "flex",
-						"flex-direction": this.direction,
-						"flex-wrap": "wrap",
-						"gap": "5px"
-				});
-				this.children.forEach(child => groupEl.append(child.create()));
-				return groupEl;
+    children: Array<Widget>;
+    constructor(...children: Array<Widget>) {
+        super();
+        this.children = children;
+    }
+    direction: "row" | "column" = "row";
+    ["withDir"](direction: "row" | "column"): this {
+        this.direction = direction;
+        return this;
+    }
+    create(): HTMLElement {
+        let groupEl = elWithStyle({
+            "display": "flex",
+            "flex-direction": this.direction,
+            "flex-wrap": "wrap",
+            "justify-content": "flex-end",
+            "align-items": "center",
+            "gap": "5px",
+            "min-width": "0",
+        });
+        this.children.forEach((child) => groupEl.append(child.create()));
+        return groupEl;
+    }
 }
 
 let widgets = {
@@ -286,9 +348,19 @@ let widgets = {
     $text: (getText?: () => string) => new TextInput(getText),
     $input: (getText?: () => string) => new TextInput(getText),
     $number: (getNumber?: () => number) => new NumberInput(getNumber),
-    $range: (min?: number, max?: number, step?: number, getNumber?: () => number) => new RangeInput(min, max, step, getNumber),
-    $slider: (min?: number, max?: number, step?: number, getNumber?: () => number) => new RangeInput(min, max, step, getNumber),
-		$group: (...children: Array<Widget>) => new Group(...children),
+    $range: (
+        min?: number,
+        max?: number,
+        step?: number,
+        getNumber?: () => number
+    ) => new RangeInput(min, max, step, getNumber),
+    $slider: (
+        min?: number,
+        max?: number,
+        step?: number,
+        getNumber?: () => number
+    ) => new RangeInput(min, max, step, getNumber),
+    $group: (...children: Array<Widget>) => new Group(...children),
 };
 Object.assign(window, widgets);
 

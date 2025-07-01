@@ -4,9 +4,11 @@ export function mkStyle(styleObj) {
 export function buttonStyle() {
     return {
         "all": "unset",
-        "padding": "2px",
-        "background": "rgb(100 100 100)",
+        "padding": "3px",
+        "background": "rgb(150 150 150)",
         "font-family": `"IBM Plex Mono", monospace`,
+        "display": "flex",
+        "text-align": "center"
     };
 }
 export function elWithStyle(styling, elType = "div") {

@@ -7,9 +7,11 @@ export function mkStyle(styleObj: Record<string, string>): string {
 export function buttonStyle(): Record<string, string> {
     return {
         "all": "unset",
-        "padding": "2px",
-        "background": "rgb(100 100 100)",
+        "padding": "3px",
+        "background": "rgb(150 150 150)",
         "font-family": `"IBM Plex Mono", monospace`,
+        "display": "flex",
+        "text-align": "center"
     };
 }
 export function elWithStyle<K extends keyof HTMLElementTagNameMap>(

@@ -13,6 +13,13 @@ let url = new URL(location.href);
 let config = {
     fontSize: url.searchParams.get("fontSize") || "14",
 };
+
+const dbguiRowClass = "__DBGUI_INJECTED_row";
+const dbguiCategoryClass = "__DBGUI_INJECTED_category";
+const styleTag = document.createElement("style");
+styleTag.innerHTML = `.${dbguiRowClass}:nth-of-type(2n):not(.${dbguiCategoryClass}),.${dbguiRowClass}.${dbguiCategoryClass}:nth-of-type(2n)>summary{background-color:rgb(200 200 200)}`; //&:not(:first-of-type){border-top:rgb(100 100 100) 1px solid;}
+document.head.insertAdjacentElement("beforeend", styleTag);
+
 class DbgUICategory {
     static cache: Map<string, DbgUICategory> = new Map();
     categoryEl: HTMLElement;
@@ -23,13 +30,14 @@ class DbgUICategory {
             "display": "flex",
             "flex-direction": "column",
         });
+        this.categoryEl.classList.add(dbguiRowClass, dbguiCategoryClass);
         this.categoryEl.dataset.categoryName = sanitizeQuotedString(key);
         let categoryKeyEl = document.createElement("summary");
         categoryKeyEl.textContent = key;
 
         this.widgetsContainerEl = elWithStyle({
             "width": "100%",
-            "overflow": "hidden",
+            //"overflow": "hidden",
         });
 
         this.categoryEl.append(categoryKeyEl, this.widgetsContainerEl);
@@ -48,21 +56,27 @@ class DbgUICategory {
         DbgUICategory.cache.set(key, dbgUICategory);
         return dbgUICategory;
     }
-    add(key: string, widget: Widget): this {
-        let el = createWidgetContainer(key, widget);
+    add(key: string, widget: Widget | null): this {
         let queriedWidget = this.widgetsContainerEl.querySelector(
             `[data-key="${sanitizeQuotedString(key)}"]`
         );
-        if (queriedWidget) {
-            queriedWidget.replaceWith(el);
-            return this;
+        if (widget === null) {
+            if (queriedWidget) {
+                queriedWidget.remove();
+            }
+        } else {
+            let el = createWidgetContainer(key, widget);
+            if (queriedWidget) {
+                queriedWidget.replaceWith(el);
+                return this;
+            }
+            insertElIntoSortedChildren(
+                this.widgetsContainerEl,
+                el,
+                key,
+                (containerChildEl) => containerChildEl.dataset.key!
+            );
         }
-        insertElIntoSortedChildren(
-            this.widgetsContainerEl,
-            el,
-            key,
-            (containerChildEl) => containerChildEl.dataset.key!
-        );
         return this;
     }
 }
@@ -111,8 +125,8 @@ class DbgUI {
 
     constructor() {
         let containerEl: HTMLElement;
-        let screenPaddingPx = 40;
-        let resizeHandleWidthPx = 20;
+        let screenPaddingPx = 10;
+        let resizeHandleWidthPx = 6;
         let containerElInterface = {
             x: screenPaddingPx,
             y: screenPaddingPx,
@@ -123,7 +137,7 @@ class DbgUI {
             maxWidth: 350,
             maxHeight: 400,
             /* 
-            attempt to make resizing generic (fail)
+            // attempt to make resizing generic (fail)
             resizeInDir(
                 dir: "horizontal" | "vertical",
                 positiveResizePxExpandsBox: boolean,
@@ -325,7 +339,8 @@ class DbgUI {
                                 window.innerHeight -
                                 (screenPaddingPx + this.height);
                         } else if (this.height - resizePx <= this.minHeight) {
-                            let difference = this.minHeight - (this.height - resizePx);
+                            let difference =
+                                this.minHeight - (this.height - resizePx);
                             this.height = this.minHeight;
                             this.y += difference;
                         } else {
@@ -349,14 +364,11 @@ class DbgUI {
                         }
                     } else {
                         if (this.y + resizePx < screenPaddingPx) {
+                            this.height -= this.y + resizePx - screenPaddingPx;
                             this.y = screenPaddingPx;
                         } else {
-                            this.y += resizePx;
-                        }
-                        if (this.height - resizePx > this.maxHeight) {
-                            this.height = this.maxHeight;
-                        } else {
                             this.height -= resizePx;
+                            this.y += resizePx;
                         }
                     }
                 }
@@ -374,25 +386,35 @@ class DbgUI {
                     if (this.y === window.innerHeight - screenPaddingPx) {
                         // do nothing
                     } else if (this.height === this.maxHeight) {
-                        this.y = Math.min(this.y + resizePx, window.innerHeight - screenPaddingPx - this.height);
+                        this.y = Math.min(
+                            this.y + resizePx,
+                            window.innerHeight - screenPaddingPx - this.height
+                        );
                     } else {
-                        this.height = Math.min(this.height + resizePx, this.maxHeight, window.innerHeight - screenPaddingPx - this.y);
+                        this.height = Math.min(
+                            this.height + resizePx,
+                            this.maxHeight,
+                            window.innerHeight - screenPaddingPx - this.y
+                        );
                     }
                 } else {
                     // dragging up
-                    
+
                     // if at top, shrink box down until minHeight
                     // if at minHeight, move box up until at top
                     // else, shrink box until minHeight
-                    if (
-                        this.y ===
-                        screenPaddingPx
-                    ) {
-                        this.height = Math.max(this.height + resizePx, this.minHeight);
+                    if (this.y === screenPaddingPx) {
+                        this.height = Math.max(
+                            this.height + resizePx,
+                            this.minHeight
+                        );
                     } else if (this.height === this.minHeight) {
                         this.y = Math.max(this.y + resizePx, screenPaddingPx);
                     } else {
-                        this.height = Math.max(this.height + resizePx, this.minHeight);
+                        this.height = Math.max(
+                            this.height + resizePx,
+                            this.minHeight
+                        );
                     }
                 }
 
@@ -410,7 +432,11 @@ class DbgUI {
                     } else if (this.width === this.maxWidth) {
                         this.x = Math.max(this.x + resizePx, screenPaddingPx);
                     } else {
-                        let newWidth = Math.min(this.width - resizePx, this.maxWidth, this.x + this.width - screenPaddingPx);
+                        let newWidth = Math.min(
+                            this.width - resizePx,
+                            this.maxWidth,
+                            this.x + this.width - screenPaddingPx
+                        );
                         this.x = this.x + this.width - newWidth;
                         this.width = newWidth;
                     }
@@ -420,12 +446,24 @@ class DbgUI {
                     // if at right, shrink box right until minWidth
                     // if at minWidth, move box right until at right
                     // else, shrink box until minWidth
-                    if (this.x + this.width === window.innerWidth - screenPaddingPx) {
-                        this.width = Math.max(this.width - resizePx, this.minWidth);
+                    if (
+                        this.x + this.width ===
+                        window.innerWidth - screenPaddingPx
+                    ) {
+                        this.width = Math.max(
+                            this.width - resizePx,
+                            this.minWidth
+                        );
                     } else if (this.width === this.minWidth) {
-                        this.x = Math.min(this.x + resizePx, window.innerWidth - screenPaddingPx - this.width);
+                        this.x = Math.min(
+                            this.x + resizePx,
+                            window.innerWidth - screenPaddingPx - this.width
+                        );
                     } else {
-                        let newWidth = Math.max(this.width - resizePx, this.minWidth);
+                        let newWidth = Math.max(
+                            this.width - resizePx,
+                            this.minWidth
+                        );
                         this.x += this.width - newWidth;
                         this.width = newWidth;
                     }
@@ -440,12 +478,22 @@ class DbgUI {
                     // if at rightmost, then don't do anything
                     // if at max width, move right until at rightmost
                     // else, expand until at right or max width
-                    if (this.x + this.width === window.innerWidth - screenPaddingPx) {
+                    if (
+                        this.x + this.width ===
+                        window.innerWidth - screenPaddingPx
+                    ) {
                         // do nothing
                     } else if (this.width === this.maxWidth) {
-                        this.x = Math.min(this.x + resizePx, window.innerWidth - screenPaddingPx - this.width);
+                        this.x = Math.min(
+                            this.x + resizePx,
+                            window.innerWidth - screenPaddingPx - this.width
+                        );
                     } else {
-                        this.width = Math.min(this.width + resizePx, this.maxWidth, window.innerWidth - screenPaddingPx - this.x);
+                        this.width = Math.min(
+                            this.width + resizePx,
+                            this.maxWidth,
+                            window.innerWidth - screenPaddingPx - this.x
+                        );
                     }
                 } else {
                     // dragging left
@@ -454,16 +502,22 @@ class DbgUI {
                     // if at minWidth, move box left until at left
                     // else, shrink box until minWidth
                     if (this.x === screenPaddingPx) {
-                        this.width = Math.max(this.width + resizePx, this.minWidth);
+                        this.width = Math.max(
+                            this.width + resizePx,
+                            this.minWidth
+                        );
                     } else if (this.width === this.minWidth) {
                         this.x = Math.max(this.x + resizePx, screenPaddingPx);
                     } else {
-                        this.width = Math.max(this.width + resizePx, this.minWidth);
+                        this.width = Math.max(
+                            this.width + resizePx,
+                            this.minWidth
+                        );
                     }
                 }
 
                 this.update();
-            },/*
+            } /*
             shouldResizeN(pointerY: number): boolean {
                 return (
                     pointerY >= screenPaddingPx &&
@@ -476,7 +530,7 @@ class DbgUI {
                     pointerY >= screenPaddingPx + this.minHeight - resizeHandleWidthPx &&
                     pointerY <= window.innerHeight - screenPaddingPx
                 );
-            },*/
+            },*/,
             update() {
                 containerEl.style.left = this.x + "px";
                 containerEl.style.top = this.y + "px";
@@ -553,9 +607,10 @@ class DbgUI {
             "display": "flex",
             "flex-direction": "column",
             "padding": "6px",
-            "min-width": "0px", // go kill urself https://css-tricks.com/preventing-a-grid-blowout/
+            "min-width": "0px",
             "max-width": "100%",
-            "overflow": "hidden",
+            "overflow": "hidden auto",
+            "gap": "3px",
         });
         this.container.append(this.contents, ...this.resizeHandles);
         this.nonCategorizedWidgetsEl = document.createElement("div");
@@ -563,8 +618,9 @@ class DbgUI {
             "display": "flex",
             "flex-direction": "column",
             "width": "100%",
-            "height": "40%",
-            "overflow-y": "auto",
+            "max-height": "40%",
+            "overflow": "hidden auto",
+            "gap": "3px",
         });
         this.categoriesContainerEl = document.createElement("div");
         this.categoriesContainerEl.style.cssText = mkStyle({
@@ -572,7 +628,8 @@ class DbgUI {
             "flex-direction": "column",
             "width": "100%",
             "flex": "1",
-            "overflow-y": "auto",
+            "overflow": "hidden auto",
+            "gap": "3px",
         });
         this.contents.append(
             this.nonCategorizedWidgetsEl,
@@ -581,40 +638,66 @@ class DbgUI {
     }
     _addToDocument() {
         document.body.appendChild(this.container);
+
+        /*
+        // ok this just infinitely loops
+        // need fix pls
+        let mo = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (!Array.from(mutation.addedNodes).includes(this.container))
+                document.body.append(this.container);
+            }
+        });
+        mo.observe(document.body, { childList: true })*/
     }
-    add(key: string, widget: Widget): this {
-        let el = createWidgetContainer(key, widget);
+    add(key: string, widget: Widget | null): this {
         let queriedWidget = this.nonCategorizedWidgetsEl.querySelector(
             `[data-key="${sanitizeQuotedString(key)}"]`
         );
-        if (queriedWidget) {
-            queriedWidget.replaceWith(el);
-            return this;
+        if (widget === null) {
+            if (queriedWidget) {
+                queriedWidget.remove();
+            }
+        } else {
+            let el = createWidgetContainer(key, widget);
+
+            if (queriedWidget) {
+                queriedWidget.replaceWith(el);
+                return this;
+            }
+            insertElIntoSortedChildren(
+                this.nonCategorizedWidgetsEl,
+                el,
+                key,
+                (containerChildEl) => containerChildEl.dataset.key!
+            );
         }
-        insertElIntoSortedChildren(
-            this.nonCategorizedWidgetsEl,
-            el,
-            key,
-            (containerChildEl) => containerChildEl.dataset.key!
-        );
         return this;
     }
     in(categoryName: string): DbgUICategory {
         return DbgUICategory.of(categoryName, this);
     }
+    addIn(categoryName: string, key: string, widget: Widget | null): this {
+        this.in(categoryName).add(key, widget);
+        return this;
+    }
 }
+
 function createWidgetContainer(key: string, widget: Widget): HTMLElement {
     let widgetEl = widget.create();
     let widgetWrapperEl = elWithStyle({
-        "overflow": "auto",
+        "flex": "1",
+        "min-width": "0",
         "display": "flex",
+        "justify-content": "end",
+        "font-size": +config.fontSize * 0.8 + "px",
     });
     widgetWrapperEl.append(widgetEl);
 
     let labelEl = document.createElement("div");
     labelEl.style.cssText = mkStyle({
-        "flex": "1",
-        "max-width": "60%",
+        "min-width": "0",
+        "max-width": "50%",
         "overflow-wrap": "anywhere",
         "text-overflow": "ellipsis",
     });
@@ -623,12 +706,16 @@ function createWidgetContainer(key: string, widget: Widget): HTMLElement {
     let containerEl = document.createElement("div");
     containerEl.style.cssText = mkStyle({
         "width": "100%",
-        "overflow": "hidden",
+        "overflow-y": "hidden",
+        "overflow-x": "auto",
         "display": "flex",
         "flex-direction": "row",
         "justify-content": "space-between",
+        "align-items": "start",
+        "flex-wrap": "nowrap",
+        "flex": "none",
     });
-
+    containerEl.classList.add(dbguiRowClass);
     containerEl.append(labelEl, widgetWrapperEl);
     containerEl.dataset.key = key;
     return containerEl;

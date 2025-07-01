@@ -1,32 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="../dist/dbgui.min.js"></script>
-</head>
-<body>
-    <script>
-        let a = 0;
-        setInterval(() => a += 1, 500);
-        dbgui()
-            .add("abc", $button("def").onClick(() => console.log(1)))
-            .add("ghi", $button("def"))
-            .add("def", $button("def"))
-            .add("def", $button("def"))
-            .add("def", $button("def"))
-            .add("def", $button("def"))
-            .add("def", $button("def"))
-            .add("def", $button("def"))
-            .add("aaaaa", $slider(0, 69, 1).onInput(console.log))
-            .add("jkl", $valueDisplay(() => a).withPollInterval("manual"))
-        dbgui().in("aab").add("sa", $button("a"))
-        dbgui().in("aab").add("asdfghjklqweryuiopasdfghjkl", $valueDisplay(() => document.body).repAsJson(false))
-        dbgui().in("acb").add("sa", $button("a"))
-        dbgui().in("aec").add("sa", $button("a"))
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <script src="../dist/dbgui.min.js"></script>
+    </head>
+    <body>
+        <script>
+            let a = 0;
+            setInterval(() => (a += 1), 500);
 
-    </script>
-    <div style="position: fixed; border: solid 40px red; left: 0;top:0;width:100vw;height:100vh;box-sizing:border-box"></div>
-</body>
+            const createLogCb = (t) => () => console.log(t);
+            
+            dbgui()
+                .add(
+                    "1 demo button:",
+                    $button("Click me!").onClick(createLogCb("button click"))
+                )
+                .add(
+                    "2 slider:",
+                    $slider(0, 100, 1)
+                        .onInput(createLogCb("slider input"))
+                        .onChange(createLogCb("slider change"))
+                )
+                .add(
+                    "3 text input:",
+                    $text()
+                        .onInput(createLogCb("text input 'input' event"))
+                        .onChange(createLogCb("text input change"))
+                )
+                .add("4 value display:", $valueDisplay(() => a))
+                .add("5 manual value display:", $valueDisplay(() => a).withPollInterval("manual"));
+
+            let obj = { a: [1, "string"], b: () => 1 };
+            dbgui()
+                .in("category 1")
+                .add(
+                    "Object.keys representation:",
+                    $valueDisplay(() => obj).repAsJson(false)
+                )
+                .add("JSON representation", $valueDisplay(() => obj).repAsJson(true));
+
+            dbgui().in("Removing Widgets")
+                .add(".Display Widget", $button("Display Widget").onClick(() => dbgui().addIn("Removing Widgets", "Example Widget", $button("I'm a widget!"))))
+                .add(".Remove Widget", $button("a").onClick(() => dbgui().addIn("Removing Widgets", "Example Widget", null)))
+        </script>
+    </body>
 </html>
