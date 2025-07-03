@@ -120,8 +120,8 @@ All methods are chainable and return `this`.
     <tr>
         <td><code>$valueDisplay</code></td>
         <td><code>&lt;T&gt;(getter: () => T)</code></td>        
-        <td><code>withPollInterval(pollInterval: number | "manual")</code>,<code>repAsJSON(representAsJson: boolean)</code></td>
-        <td>Displays a single value that can either be automatically or manually polled. repAsJSON determines if <code>JSON.stringify</code> or <code>Object.toString</code> is used to convert its value to a string.</td>
+        <td><code>withPollInterval(pollInterval: number | "manual")</code>,<code>withStringifyFunction(stringifyFunction: (val: T) => string)</code></td>
+        <td>Displays a single value that can either be automatically or manually polled. The default stringify function is Object.toString()</td>
     </tr>
     <tr>
         <td><code>$group</code></td>
