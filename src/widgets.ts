@@ -338,6 +338,16 @@ Object.assign(window, widgets);
 type Widgets = {
     [K in keyof typeof widgets]: (typeof widgets)[K];
 };
+
 declare global {
     interface Window extends Widgets {}
+    
+    const $button: typeof widgets.$button;
+    const $valueDisplay: typeof widgets.$valueDisplay;
+    const $text: typeof widgets.$text;
+    const $input: typeof widgets.$input;
+    const $number: typeof widgets.$number;
+    const $range: typeof widgets.$range;
+    const $slider: typeof widgets.$slider;
+    const $group: typeof widgets.$group;
 }
