@@ -53,19 +53,10 @@ class ValueDisplay extends Widget {
         this.pollInterval = ms;
         return this;
     }
-    _repAsJson = true;
-    /**
-     * If the value should be represented by `JSON.stringify`ing it or not.
-     * If false, the value will be displayed with `Object.toString`
-     * @param repAsJson
-     * @returns this
-     */
-    ["repAsJSON"](repAsJson) {
-        this._repAsJson = repAsJson;
+    stringifyFn = (val) => val + "";
+    ["withStringifyFunction"](stringifyFunction) {
+        this.stringifyFn = stringifyFunction;
         return this;
-    }
-    ["repAsJson"](repAsJson) {
-        return this.repAsJSON(repAsJson);
     }
     create() {
         let valueDisplayContainerEl = elWithStyle({
@@ -74,35 +65,25 @@ class ValueDisplay extends Widget {
             "align-items": "center",
             "gap": "3px",
         });
+        let valueDisplayEl = elWithStyle({});
+        valueDisplayEl.textContent = this.stringifyFn(this.valueGetter());
+        const update = () => {
+            valueDisplayEl.textContent = "...";
+            this.currentValue = this.valueGetter();
+            valueDisplayEl.textContent = this.stringifyFn(this.currentValue);
+        };
+        valueDisplayContainerEl.append(valueDisplayEl);
         if (this.pollInterval === "manual") {
-            let valueDisplayEl = elWithStyle({});
-            valueDisplayEl.textContent = JSON.stringify(this.valueGetter(), null, 2);
             let valueUpdateBtn = elWithStyle({
                 ...buttonStyle(),
             }, "button");
             valueUpdateBtn.textContent = "Update";
-            valueUpdateBtn.onclick = () => {
-                valueDisplayEl.textContent = "...";
-                this.currentValue = this.valueGetter();
-                if (this._repAsJson) {
-                    valueDisplayEl.textContent = JSON.stringify(this.currentValue, null, 2);
-                }
-                else {
-                    valueDisplayEl.textContent = this.currentValue + "";
-                }
-            };
-            valueDisplayContainerEl.append(valueDisplayEl, valueUpdateBtn);
+            valueUpdateBtn.onclick = update;
+            valueDisplayContainerEl.append(valueUpdateBtn);
         }
         else {
             let pollIntervalId = setInterval(() => {
-                this.currentValue = this.valueGetter();
-                if (this._repAsJson) {
-                    valueDisplayContainerEl.textContent = JSON.stringify(this.currentValue, null, 2);
-                }
-                else {
-                    valueDisplayContainerEl.textContent =
-                        this.currentValue + "";
-                }
+                update();
             }, this.pollInterval);
             let gc = new FinalizationRegistry(() => {
                 clearInterval(pollIntervalId);
@@ -149,6 +130,7 @@ class TextInput extends Widget {
         textInputEl.addEventListener("blur", () => (isFocused = true));
         textInputEl.addEventListener("input", () => this.onInputCb(textInputEl.value));
         textInputEl.addEventListener("change", () => this.onChangeCb(textInputEl.value));
+        // prevent memory leak using finalizationregistry or smthin
         setTimeout(() => {
             if (isFocused)
                 return;
@@ -193,8 +175,8 @@ class NumberInput extends Widget {
         let isFocused = false;
         numberInputEl.addEventListener("focus", () => (isFocused = true));
         numberInputEl.addEventListener("blur", () => (isFocused = true));
-        numberInputEl.addEventListener("input", () => this.onInputCb(numberInputEl.value));
-        numberInputEl.addEventListener("change", () => this.onChangeCb(numberInputEl.value));
+        numberInputEl.addEventListener("input", () => this.onInputCb(+numberInputEl.value));
+        numberInputEl.addEventListener("change", () => this.onChangeCb(+numberInputEl.value));
         setTimeout(() => {
             if (isFocused)
                 return;
@@ -212,13 +194,13 @@ class RangeInput extends Widget {
     max;
     step;
     getNumber = () => 0;
-    constructor(min = 0, max = 100, step = 1, getNumber) {
+    constructor(min = 0, max = 100, step = 1, defaultNumber) {
         super();
         this.min = min;
         this.max = max;
         this.step = step;
-        if (getNumber)
-            this.getNumber = getNumber;
+        if (defaultNumber)
+            this.getNumber = defaultNumber;
     }
     onChangeCb = (_) => { };
     ["onChange"](cb) {
@@ -249,8 +231,8 @@ class RangeInput extends Widget {
         let isFocused = false;
         rangeEl.addEventListener("focus", () => (isFocused = true));
         rangeEl.addEventListener("blur", () => (isFocused = true));
-        rangeEl.addEventListener("input", () => this.onInputCb(rangeEl.value));
-        rangeEl.addEventListener("change", () => this.onChangeCb(rangeEl.value));
+        rangeEl.addEventListener("input", () => this.onInputCb(+rangeEl.value));
+        rangeEl.addEventListener("change", () => this.onChangeCb(+rangeEl.value));
         setTimeout(() => {
             if (isFocused)
                 return;

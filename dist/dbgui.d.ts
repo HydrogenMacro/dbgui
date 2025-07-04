@@ -22,6 +22,8 @@ declare class DbgUI {
     add(key: string, widget: Widget | null): this;
     in(categoryName: string): DbgUICategory;
     addIn(categoryName: string, key: string, widget: Widget | null): this;
+    show(): void;
+    hide(): void;
 }
 declare global {
     const dbgui: () => DbgUI;

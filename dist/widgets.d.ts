@@ -30,15 +30,8 @@ declare class ValueDisplay<T> extends Widget {
     constructor(valueGetter: () => T);
     pollInterval: number | "manual";
     ["withPollInterval"](ms: number | "manual"): this;
-    _repAsJson: boolean;
-    /**
-     * If the value should be represented by `JSON.stringify`ing it or not.
-     * If false, the value will be displayed with `Object.toString`
-     * @param repAsJson
-     * @returns this
-     */
-    ["repAsJSON"](repAsJson: boolean): this;
-    ["repAsJson"](repAsJson: boolean): this;
+    stringifyFn: (val: T) => string;
+    ["withStringifyFunction"](stringifyFunction: (val: T) => string): this;
     create(): HTMLElement;
 }
 /**
@@ -78,7 +71,7 @@ declare class RangeInput extends Widget {
     max: number;
     step: number;
     getNumber: () => number;
-    constructor(min?: number, max?: number, step?: number, getNumber?: () => number);
+    constructor(min?: number, max?: number, step?: number, defaultNumber?: () => number);
     onChangeCb: (_: number) => void;
     ["onChange"](cb: (val: number) => void): this;
     onInputCb: (val: number) => void;
@@ -111,5 +104,13 @@ type Widgets = {
 declare global {
     interface Window extends Widgets {
     }
+    const $button: typeof widgets.$button;
+    const $valueDisplay: typeof widgets.$valueDisplay;
+    const $text: typeof widgets.$text;
+    const $input: typeof widgets.$input;
+    const $number: typeof widgets.$number;
+    const $range: typeof widgets.$range;
+    const $slider: typeof widgets.$slider;
+    const $group: typeof widgets.$group;
 }
 export {};
