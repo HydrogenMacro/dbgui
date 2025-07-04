@@ -18,7 +18,7 @@ const dbguiRowClass = "__DBGUI_INJECTED_row";
 const dbguiCategoryClass = "__DBGUI_INJECTED_category";
 const dbguiSummaryClass = "__DBGUI_INJECTED_summary";
 const styleTag = document.createElement("style");
-styleTag.innerHTML = `.${dbguiRowClass}:nth-of-type(2n):not(.${dbguiCategoryClass}),.${dbguiRowClass}.${dbguiCategoryClass}:nth-of-type(2n)>summary{background-color:rgb(200 200 200) !important;}.${dbguiSummaryClass}::marker{all: revert !important;}`; //&:not(:first-of-type){border-top:rgb(100 100 100) 1px solid;}
+styleTag.innerHTML = `.${dbguiRowClass}:nth-of-type(2n):not(.${dbguiCategoryClass}),.${dbguiRowClass}.${dbguiCategoryClass}:nth-of-type(2n)>summary{background-color:rgb(200 200 200) !important;}.${dbguiSummaryClass}{list-style: inside disclosure-closed;}`; //&:not(:first-of-type){border-top:rgb(100 100 100) 1px solid;}
 document.head.insertAdjacentElement("beforeend", styleTag);
 
 class DbgUICategory {
