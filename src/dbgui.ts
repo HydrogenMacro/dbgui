@@ -131,15 +131,18 @@ class DbgUI {
         let containerEl: HTMLElement;
         let screenPaddingPx = 10;
         let resizeHandleWidthPx = 6;
+        let remainingScreenWidth = (window.innerWidth - 2 * screenPaddingPx);
+        let remainingScreenHeight = (window.innerHeight - 2 * screenPaddingPx);
+        let remainingScreenMinSize = remainingScreenWidth < remainingScreenHeight ? remainingScreenWidth : remainingScreenHeight;
         let containerElInterface = {
             x: screenPaddingPx,
             y: screenPaddingPx,
-            width: Math.max(250, window.innerWidth * 3 / 5 - 2 * screenPaddingPx),
-            height: Math.max(300, window.innerHeight * 4 / 5 - 2 * screenPaddingPx),
-            minWidth: 100,
-            minHeight: 100,
-            maxWidth: 350,
-            maxHeight: 400,
+            width: Math.max(250,remainingScreenWidth * 2 / 5),
+            height: Math.max(300, remainingScreenHeight * 3 / 5),
+            minWidth: remainingScreenMinSize * 1/6,
+            minHeight: remainingScreenMinSize * 1/6,
+            maxWidth: remainingScreenWidth * 5/6,
+            maxHeight: remainingScreenHeight * 5/6,
             /* 
             // attempt to make resizing generic (fail)
             resizeInDir(
