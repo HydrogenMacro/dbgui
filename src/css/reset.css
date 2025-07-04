@@ -14,6 +14,8 @@
 ) {
     all: unset;
     display: revert;
+    min-width: 0;
+    min-height: 0;
 }
 
 /* Preferred box-sizing value */
@@ -128,8 +130,14 @@ meter {
  * additions by hydrogenmacro
  ***/
 
+iframe {
+    border: none;
+}
+
 html,
 body {
+    overflow-x: hidden;
+    overflow-y: auto;
     margin: 0;
     padding: 0;
     width: 100svw;
