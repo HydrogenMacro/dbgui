@@ -147,6 +147,7 @@ class TextInput extends Widget {
         textInputEl.addEventListener("change", () =>
             this.onChangeCb(textInputEl.value),
         );
+        // prevent memory leak using finalizationregistry or smthin
         setTimeout(() => {
             if (isFocused) return;
             textInputEl.value = this.getText();
@@ -194,10 +195,10 @@ class NumberInput extends Widget {
         numberInputEl.addEventListener("focus", () => (isFocused = true));
         numberInputEl.addEventListener("blur", () => (isFocused = true));
         numberInputEl.addEventListener("input", () =>
-            this.onInputCb(numberInputEl.value as any as number),
+            this.onInputCb(+numberInputEl.value),
         );
         numberInputEl.addEventListener("change", () =>
-            this.onChangeCb(numberInputEl.value as any as number),
+            this.onChangeCb(+numberInputEl.value),
         );
         setTimeout(() => {
             if (isFocused) return;
@@ -220,13 +221,13 @@ class RangeInput extends Widget {
         min: number = 0,
         max: number = 100,
         step: number = 1,
-        getNumber?: () => number,
+        defaultNumber?: () => number,
     ) {
         super();
         this.min = min;
         this.max = max;
         this.step = step;
-        if (getNumber) this.getNumber = getNumber;
+        if (defaultNumber) this.getNumber = defaultNumber;
     }
     onChangeCb = (_: number) => {};
     ["onChange"](cb: (val: number) => void): this {
@@ -263,10 +264,10 @@ class RangeInput extends Widget {
         rangeEl.addEventListener("focus", () => (isFocused = true));
         rangeEl.addEventListener("blur", () => (isFocused = true));
         rangeEl.addEventListener("input", () =>
-            this.onInputCb(rangeEl.value as any as number),
+            this.onInputCb(+rangeEl.value),
         );
         rangeEl.addEventListener("change", () =>
-            this.onChangeCb(rangeEl.value as any as number),
+            this.onChangeCb(+rangeEl.value),
         );
         setTimeout(() => {
             if (isFocused) return;

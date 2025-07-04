@@ -130,8 +130,8 @@ class DbgUI {
         let containerElInterface = {
             x: screenPaddingPx,
             y: screenPaddingPx,
-            width: 250,
-            height: 300,
+            width: Math.max(250, window.innerWidth * 3 / 5 - 2 * screenPaddingPx),
+            height: Math.max(300, window.innerHeight * 4 / 5 - 2 * screenPaddingPx),
             minWidth: 100,
             minHeight: 100,
             maxWidth: 350,
@@ -552,6 +552,7 @@ class DbgUI {
             "height": containerElInterface.height + "px",
             "max-height": containerElInterface.height + "px",
             "user-select": "none",
+            "background": "rgb(230 230 230 / .7)"
         });
         this.moveHandle = elWithStyle({
             "background": "beige",
@@ -681,6 +682,13 @@ class DbgUI {
         this.in(categoryName).add(key, widget);
         return this;
     }
+    show() {
+        this.container.style.display = "grid";
+    }
+    hide() {
+        this.container.style.display = "none";
+    }
+    
 }
 
 function createWidgetContainer(key: string, widget: Widget): HTMLElement {
