@@ -18,7 +18,7 @@ const dbguiRowClass = "__DBGUI_INJECTED_row";
 const dbguiCategoryClass = "__DBGUI_INJECTED_category";
 const dbguiSummaryClass = "__DBGUI_INJECTED_summary";
 const styleTag = document.createElement("style");
-styleTag.innerHTML = `.${dbguiRowClass}:nth-of-type(2n):not(.${dbguiCategoryClass}),.${dbguiRowClass}.${dbguiCategoryClass}:nth-of-type(2n)>summary{background-color:rgb(200 200 200) !important;}.${dbguiSummaryClass}::marker{display:block !important;}`; //&:not(:first-of-type){border-top:rgb(100 100 100) 1px solid;}
+styleTag.innerHTML = `.${dbguiRowClass}:nth-of-type(2n):not(.${dbguiCategoryClass}),.${dbguiRowClass}.${dbguiCategoryClass}:nth-of-type(2n)>summary{background-color:rgb(200 200 200) !important;}.${dbguiSummaryClass}::marker{all: revert !important;}`; //&:not(:first-of-type){border-top:rgb(100 100 100) 1px solid;}
 document.head.insertAdjacentElement("beforeend", styleTag);
 
 class DbgUICategory {
@@ -137,8 +137,8 @@ class DbgUI {
         let containerElInterface = {
             x: screenPaddingPx,
             y: screenPaddingPx,
-            width: Math.max(250,remainingScreenWidth * 2 / 5),
-            height: Math.max(300, remainingScreenHeight * 3 / 5),
+            width: remainingScreenWidth * 2 / 5,
+            height: remainingScreenHeight * 3 / 5,
             minWidth: remainingScreenMinSize * 1/6,
             minHeight: remainingScreenMinSize * 1/6,
             maxWidth: remainingScreenWidth * 5/6,

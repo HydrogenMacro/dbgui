@@ -227,7 +227,7 @@ class RangeInput extends Widget {
             "min-width": "0",
             "width": "80px",
             "flex": "1",
-            "background": "rgb(230 230 230)",
+            "background": "#333333",
             "height": "7px",
         }, "input");
         rangeEl.type = "range";
