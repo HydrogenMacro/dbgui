@@ -1,7 +1,7 @@
 set shell := ["cmd.exe", "/c"]
 
 install-build-tools:
-    npm i -g google-closure-compiler esbuild
+    npm i -g google-closure-compiler esbuild typescript
 
 build:
     tsc
@@ -13,7 +13,7 @@ build:
         --js_output_file=dist/dbgui.min.js \
         --compilation_level SIMPLE
 
-minify: build
+minify--NOT_WORKING: build
     google-closure-compiler \
         --js=dist/widgets.js \
         --js=dist/dbgui.js \

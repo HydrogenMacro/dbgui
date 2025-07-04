@@ -16,8 +16,9 @@ let config = {
 
 const dbguiRowClass = "__DBGUI_INJECTED_row";
 const dbguiCategoryClass = "__DBGUI_INJECTED_category";
+const dbguiSummaryClass = "__DBGUI_INJECTED_summary";
 const styleTag = document.createElement("style");
-styleTag.innerHTML = `.${dbguiRowClass}:nth-of-type(2n):not(.${dbguiCategoryClass}),.${dbguiRowClass}.${dbguiCategoryClass}:nth-of-type(2n)>summary{background-color:rgb(200 200 200)}`; //&:not(:first-of-type){border-top:rgb(100 100 100) 1px solid;}
+styleTag.innerHTML = `.${dbguiRowClass}:nth-of-type(2n):not(.${dbguiCategoryClass}),.${dbguiRowClass}.${dbguiCategoryClass}:nth-of-type(2n)>summary{background-color:rgb(200 200 200) !important;}.${dbguiSummaryClass}::marker{display:block !important;}`; //&:not(:first-of-type){border-top:rgb(100 100 100) 1px solid;}
 document.head.insertAdjacentElement("beforeend", styleTag);
 
 class DbgUICategory {
@@ -32,7 +33,10 @@ class DbgUICategory {
         });
         this.categoryEl.classList.add(dbguiRowClass, dbguiCategoryClass);
         this.categoryEl.dataset.categoryName = sanitizeQuotedString(key);
-        let categoryKeyEl = document.createElement("summary");
+        let categoryKeyEl = elWithStyle({
+
+        }, "summary");
+        categoryKeyEl.classList.add(dbguiSummaryClass);
         categoryKeyEl.textContent = key;
 
         this.widgetsContainerEl = elWithStyle({
@@ -612,6 +616,7 @@ class DbgUI {
             "max-width": "100%",
             "overflow": "hidden auto",
             "gap": "3px",
+            "user-select": "auto"
         });
         this.container.append(this.contents, ...this.resizeHandles);
         this.nonCategorizedWidgetsEl = document.createElement("div");
@@ -699,6 +704,7 @@ function createWidgetContainer(key: string, widget: Widget): HTMLElement {
         "display": "flex",
         "justify-content": "end",
         "font-size": +config.fontSize * 0.8 + "px",
+        "align-self": "center"
     });
     widgetWrapperEl.append(widgetEl);
 

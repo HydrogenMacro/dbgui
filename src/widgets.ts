@@ -184,8 +184,12 @@ class NumberInput extends Widget {
     create(): HTMLElement {
         let numberInputEl = (this.numberInputEl = elWithStyle(
             {
+                "all": "unset",
+                "padding": "0 2px",
                 "min-width": "0",
                 "max-width": "80px",
+                "background": "rgb(240 240 240)",
+                "border": "solid 1px rgb(60 60 60)",
             },
             "input",
         ));
@@ -248,10 +252,13 @@ class RangeInput extends Widget {
 
         let rangeEl = elWithStyle(
             {
+                "all": "unset",
                 "max-width": "80px",
                 "min-width": "0",
                 "width": "80px",
                 "flex": "1",
+                "background": "rgb(230 230 230)",
+                "height": "7px",
             },
             "input",
         );
@@ -278,6 +285,7 @@ class RangeInput extends Widget {
             "display": "flex",
             "min-width": "0",
             "align-items": "center",
+            "gap": "5px"
         });
         containerEl.append(minDisplayEl, rangeEl, maxDisplayEl);
         return containerEl;
@@ -314,25 +322,25 @@ class Group extends Widget {
 }
 
 let widgets = {
-    $button: (text: string) => new Button(text),
-    $valueDisplay: <T>(valueGetter: () => T) =>
+    "$button": (text: string) => new Button(text),
+    "$valueDisplay": <T>(valueGetter: () => T) =>
         new ValueDisplay<T>(valueGetter),
-    $text: (getText?: () => string) => new TextInput(getText),
-    $input: (getText?: () => string) => new TextInput(getText),
-    $number: (getNumber?: () => number) => new NumberInput(getNumber),
-    $range: (
+    "$text": (getText?: () => string) => new TextInput(getText),
+    "$input": (getText?: () => string) => new TextInput(getText),
+    "$number": (getNumber?: () => number) => new NumberInput(getNumber),
+    "$range": (
         min?: number,
         max?: number,
         step?: number,
         getNumber?: () => number,
     ) => new RangeInput(min, max, step, getNumber),
-    $slider: (
+    "$slider": (
         min?: number,
         max?: number,
         step?: number,
         getNumber?: () => number,
     ) => new RangeInput(min, max, step, getNumber),
-    $group: (...children: Array<Widget>) => new Group(...children),
+    "$group": (...children: Array<Widget>) => new Group(...children),
 };
 Object.assign(window, widgets);
 

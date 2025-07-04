@@ -31,20 +31,21 @@
                         .onChange(createLogCb("text input change"))
                 )
                 .add("4 value display:", $valueDisplay(() => a))
-                .add("5 manual value display:", $valueDisplay(() => a).withPollInterval("manual"));
+                .add("5 manual value display:", $valueDisplay(() => a).withPollInterval("manual"))
+                .add("6 groups", $group($button("Button 1"), $button("Button 2"), $button("Button 3"), $button("Button 4")));
 
             let obj = { a: [1, "string"], b: () => 1 };
             dbgui()
                 .in("category 1")
                 .add(
                     "Object.keys representation:",
-                    $valueDisplay(() => obj).repAsJson(false)
+                    $valueDisplay(() => obj)
                 )
-                .add("JSON representation", $valueDisplay(() => obj).repAsJson(true));
+                .add("JSON representation", $valueDisplay(() => obj).withStringifyFunction(JSON.stringify));
 
             dbgui().in("Removing Widgets")
                 .add(".Display Widget", $button("Display Widget").onClick(() => dbgui().addIn("Removing Widgets", "Example Widget", $button("I'm a widget!"))))
-                .add(".Remove Widget", $button("a").onClick(() => dbgui().addIn("Removing Widgets", "Example Widget", null)))
+                .add(".Remove Widget", $button("Remove").onClick(() => dbgui().addIn("Removing Widgets", "Example Widget", null)))
         </script>
     </body>
 </html>
